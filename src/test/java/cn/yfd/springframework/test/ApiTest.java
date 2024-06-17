@@ -1,9 +1,19 @@
 package cn.yfd.springframework.test;
 
+import cn.yfd.springframework.Beans.factory.BeanFactory;
 import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
 import cn.yfd.springframework.Beans.factory.support.DefaultListableBeanFactory;
+import cn.yfd.springframework.test.bean.Interecptor;
 import cn.yfd.springframework.test.bean.UserService;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+import net.sf.cglib.proxy.NoOp;
 import org.junit.Test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ApiTest {
 
@@ -26,4 +36,53 @@ public class ApiTest {
         userService.queryUserInfo();
         System.out.println(userService_singleton.hashCode());
     }
+
+    @Test
+    public void test_BeanFactoryForCglib(){
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+
+        BeanDefinition beanDefinition = new BeanDefinition(UserService.class);
+        beanFactory.registerBeanDefinition("userService", beanDefinition);
+
+        UserService userService = (UserService) beanFactory.getBean("userService");
+        userService.queryUserInfo();
+    }
+
+    @Test
+    public void test_newInstance() throws InstantiationException, IllegalAccessException {
+        UserService userService = UserService.class.newInstance();
+        System.out.println(userService);
+    }
+
+    @Test
+    public void test_constructor() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<UserService> userServiceClass = UserService.class;
+        Constructor<UserService> declaredConstructor = userServiceClass.getDeclaredConstructor(String.class);
+        UserService userService = declaredConstructor.newInstance("羊粪蛋");
+        userService.queryUserInfo();
+    }
+
+    @Test
+    public void test_parameter() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<UserService> userServiceClass = UserService.class;
+        Constructor<?>[] declaredConstructors = userServiceClass.getDeclaredConstructors();
+        Constructor<?> declaredConstructor = declaredConstructors[0];
+        Constructor<UserService> constructor = userServiceClass.getConstructor(declaredConstructor.getParameterTypes());
+        UserService userService = constructor.newInstance("羊粪蛋");
+        System.out.println(userService);
+    }
+
+    @Test
+    public void test_Cglib(){
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(UserService.class);
+        enhancer.setCallback(new Interecptor());
+
+        UserService userService = (UserService) enhancer.create(new Class[]{String.class}, new Object[]{"羊粪蛋"});
+        //System.out.println(userService);
+        System.out.println("=============================");
+        userService.queryUserInfo();
+    }
+
+
 }
