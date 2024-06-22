@@ -1,7 +1,11 @@
 package cn.yfd.springframework.Beans.factory.support;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.yfd.springframework.Beans.BeansException;
+import cn.yfd.springframework.Beans.PropertyValue;
+import cn.yfd.springframework.Beans.PropertyValues;
 import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
+import cn.yfd.springframework.Beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
 
@@ -18,6 +22,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throw new BeansException("Instantiation of bean failed", e);
         }
         addSingleton(beanName, bean);
+        applyPropertyValues(beanName, bean, beanDefinition);
         return bean;
     }
 
@@ -34,7 +39,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         Object instantiate = getInstantiationStrategy().instantiate(beanDefinition, beanName, constructor, arg);
         return instantiate;
+    }
 
+    protected void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition){
+        try {
+            PropertyValues propertyValues = beanDefinition.getPropertyValues();
+            for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
+                String name = propertyValue.getName();
+                Object value = propertyValue.getValue();
+
+                if(value instanceof BeanReference){
+                    BeanReference v = (BeanReference) value;
+                    value = getBean(v.getBeanName());
+                }
+
+                BeanUtil.setFieldValue(bean, name, value);
+            }
+        } catch (BeansException e) {
+            throw new BeansException("Error setting property value"+beanName);
+        }
     }
 
     public InstantiationStrategy getInstantiationStrategy(){

@@ -1,9 +1,13 @@
 package cn.yfd.springframework.test;
 
+import cn.yfd.springframework.Beans.PropertyValue;
+import cn.yfd.springframework.Beans.PropertyValues;
 import cn.yfd.springframework.Beans.factory.BeanFactory;
 import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
+import cn.yfd.springframework.Beans.factory.config.BeanReference;
 import cn.yfd.springframework.Beans.factory.support.DefaultListableBeanFactory;
 import cn.yfd.springframework.test.bean.Interecptor;
+import cn.yfd.springframework.test.bean.UserDao;
 import cn.yfd.springframework.test.bean.UserService;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -84,5 +88,24 @@ public class ApiTest {
         userService.queryUserInfo();
     }
 
+    @Test
+    public void test_Property(){
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        beanFactory.registerBeanDefinition("userDao", new BeanDefinition(UserDao.class));
 
+        PropertyValues propertyValues = new PropertyValues();
+        propertyValues.addPropertyValue(new PropertyValue("uid", "100001"));
+        propertyValues.addPropertyValue(new PropertyValue("userDao", new BeanReference("userDao")));
+
+        BeanDefinition beanDefinition = new BeanDefinition(UserService.class, propertyValues);
+        beanFactory.registerBeanDefinition("userService", beanDefinition);
+
+        UserService userService = (UserService) beanFactory.getBean("userService");
+        userService.queryUserInfo();
+
+        UserDao userDao = userService.getUserDao();
+        String s = userDao.queryUserName("100002");
+        System.out.println(s);
+
+    }
 }
