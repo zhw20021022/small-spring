@@ -18,11 +18,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object bean = null;
         try{
             bean = createBeanInstance(beanName, beanDefinition, args);
+
+            applyPropertyValues(beanName, bean, beanDefinition);
         }catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
         addSingleton(beanName, bean);
-        applyPropertyValues(beanName, bean, beanDefinition);
         return bean;
     }
 
@@ -52,7 +53,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                     BeanReference v = (BeanReference) value;
                     value = getBean(v.getBeanName());
                 }
-
                 BeanUtil.setFieldValue(bean, name, value);
             }
         } catch (BeansException e) {

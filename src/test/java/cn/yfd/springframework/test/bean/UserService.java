@@ -13,8 +13,8 @@ public class UserService {
         this.name = name;
     }
 
-    public void queryUserInfo(){
-        System.out.println("查询用户信息:"+userDao.queryUserName(uid));
+    public String queryUserInfo(){
+        return userDao.queryUserName(uid);
     }
 
     public UserDao getUserDao() {

@@ -1,11 +1,15 @@
 package cn.yfd.springframework.test;
 
+import cn.hutool.core.io.IoUtil;
 import cn.yfd.springframework.Beans.PropertyValue;
 import cn.yfd.springframework.Beans.PropertyValues;
 import cn.yfd.springframework.Beans.factory.BeanFactory;
 import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
 import cn.yfd.springframework.Beans.factory.config.BeanReference;
 import cn.yfd.springframework.Beans.factory.support.DefaultListableBeanFactory;
+import cn.yfd.springframework.Beans.factory.xml.XMLBeanDefinitionReader;
+import cn.yfd.springframework.core.io.DefaultResourceLoader;
+import cn.yfd.springframework.core.io.Resource;
 import cn.yfd.springframework.test.bean.Interecptor;
 import cn.yfd.springframework.test.bean.UserDao;
 import cn.yfd.springframework.test.bean.UserService;
@@ -13,8 +17,11 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -106,6 +113,65 @@ public class ApiTest {
         UserDao userDao = userService.getUserDao();
         String s = userDao.queryUserName("100002");
         System.out.println(s);
-
     }
+
+    private DefaultResourceLoader resourceLoader;
+
+    @Before
+    public void init(){
+        resourceLoader = new DefaultResourceLoader();
+    }
+
+    @Test
+    public void test_classpath() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:important.properties");
+        InputStream inputStream = resource.getInputStream();
+        String content = IoUtil.readUtf8(inputStream);
+        System.out.println(content);
+    }
+
+    @Test
+    public void test_file() throws IOException {
+        Resource resource = resourceLoader.getResource("src/test/resources/important.properties");
+        InputStream inputStream = resource.getInputStream();
+        String content = IoUtil.readUtf8(inputStream);
+        System.out.println(content);
+    }
+
+    @Test
+    public void test_url() throws IOException {
+        Resource resource = resourceLoader.getResource("https://baidu.com");
+        InputStream inputStream = resource.getInputStream();
+        String content = IoUtil.readUtf8(inputStream);
+        System.out.println(content);
+    }
+
+    @Test
+    public void test_xml(){
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+
+        XMLBeanDefinitionReader reader = new XMLBeanDefinitionReader(beanFactory);
+        reader.loadBeanDefinitions("classpath:spring.xml");
+
+        UserService userService = beanFactory.getBean("userService", UserService.class);
+        String result = userService.queryUserInfo();
+        System.out.println("测试结果"+result);
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

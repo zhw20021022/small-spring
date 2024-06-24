@@ -6,15 +6,20 @@ import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
 
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
     @Override
-    public Object getBean(String name) {
+    public Object getBean(String name) throws BeansException{
         Object bean = doGetBean(name, null);
         return bean;
     }
 
     @Override
-    public Object getBean(String name, Object...args){
+    public Object getBean(String name, Object...args) throws BeansException{
         Object bean = doGetBean(name, args);
         return bean;
+    }
+
+    @Override
+    public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+        return (T) getBean(name);
     }
 
     protected <T> T doGetBean(final String name, final Object[] args){
