@@ -4,12 +4,14 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.yfd.springframework.Beans.BeansException;
 import cn.yfd.springframework.Beans.PropertyValue;
 import cn.yfd.springframework.Beans.PropertyValues;
+import cn.yfd.springframework.Beans.factory.config.AutowireCapableBeanFactory;
 import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
+import cn.yfd.springframework.Beans.factory.config.BeanPostProcessor;
 import cn.yfd.springframework.Beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
 
-public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory {
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
     InstantiationStrategy instantiationStrategy = new CglibSubClassingInstantiationStrategy();
 
@@ -18,8 +20,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object bean = null;
         try{
             bean = createBeanInstance(beanName, beanDefinition, args);
-
+            //给bean填充属性
             applyPropertyValues(beanName, bean, beanDefinition);
+            //执行bean的初始化方法，和前置后置处理方法
+            bean = initializeBean(beanName, bean, beanDefinition);
         }catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
@@ -66,5 +70,40 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     public void SetInstantiationStrategy(InstantiationStrategy instantiationStrategy){
         this.instantiationStrategy = instantiationStrategy;
+    }
+
+    public Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition){
+        Object wrappedBean = applyBeanPostProcessorBeforeInitiation(bean, beanName);
+
+        //待完成处理
+        invokeInitMethods(beanName, wrappedBean, beanDefinition);
+
+        wrappedBean = applyBeanPostProcessorAfterInitiation(wrappedBean, beanName);
+
+        return wrappedBean;
+    }
+
+    public void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition){
+
+    }
+
+    public Object applyBeanPostProcessorBeforeInitiation(Object existingBean, String beanName) throws BeansException{
+        Object result = existingBean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            Object current = beanPostProcessor.postProcessorBeforeInitialization(result, beanName);
+            if(current == null) return result;
+            result = current;
+        }
+        return result;
+    }
+
+    public Object applyBeanPostProcessorAfterInitiation(Object existingBean, String beanName) throws BeansException{
+        Object result = existingBean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            Object current = beanPostProcessor.postProcessorAfterInitialization(result, beanName);
+            if(current == null) return result;
+            result = current;
+        }
+        return result;
     }
 }

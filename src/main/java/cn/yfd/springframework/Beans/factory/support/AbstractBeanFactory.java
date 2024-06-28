@@ -3,8 +3,16 @@ package cn.yfd.springframework.Beans.factory.support;
 import cn.yfd.springframework.Beans.BeansException;
 import cn.yfd.springframework.Beans.factory.BeanFactory;
 import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
+import cn.yfd.springframework.Beans.factory.config.BeanPostProcessor;
+import cn.yfd.springframework.Beans.factory.config.ConfigurableBeanFactory;
 
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+
+    private final List<BeanPostProcessor> beanPostProcessorList = new ArrayList<>();
+
     @Override
     public Object getBean(String name) throws BeansException{
         Object bean = doGetBean(name, null);
@@ -37,5 +45,13 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     protected abstract Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException;
 
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessorList.remove(beanPostProcessor);
+        this.beanPostProcessorList.add(beanPostProcessor);
+    }
 
+    public List<BeanPostProcessor> getBeanPostProcessors(){
+        return beanPostProcessorList;
+    }
 }

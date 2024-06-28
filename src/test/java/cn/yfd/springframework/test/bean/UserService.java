@@ -7,14 +7,34 @@ public class UserService {
     private String uid;
     private String name;
 
+    private String location;
+
+    private String company;
+
     public UserService(){
     }
     public UserService(String name) {
         this.name = name;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
     public String queryUserInfo(){
-        return userDao.queryUserName(uid);
+        return userDao.queryUserName(uid)+" "+name+" "+location+" "+company;
     }
 
     public UserDao getUserDao() {

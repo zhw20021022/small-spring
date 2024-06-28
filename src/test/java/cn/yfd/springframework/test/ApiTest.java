@@ -8,11 +8,14 @@ import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
 import cn.yfd.springframework.Beans.factory.config.BeanReference;
 import cn.yfd.springframework.Beans.factory.support.DefaultListableBeanFactory;
 import cn.yfd.springframework.Beans.factory.xml.XMLBeanDefinitionReader;
+import cn.yfd.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.yfd.springframework.core.io.DefaultResourceLoader;
 import cn.yfd.springframework.core.io.Resource;
 import cn.yfd.springframework.test.bean.Interecptor;
 import cn.yfd.springframework.test.bean.UserDao;
 import cn.yfd.springframework.test.bean.UserService;
+import cn.yfd.springframework.test.common.MyBeanPostFactoryPostProcessor;
+import cn.yfd.springframework.test.common.MyBeanPostProcessor;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -156,6 +159,33 @@ public class ApiTest {
         UserService userService = beanFactory.getBean("userService", UserService.class);
         String result = userService.queryUserInfo();
         System.out.println("测试结果"+result);
+    }
+
+    @Test
+    public void test_BeanFactoryPostProcessorAndBeanPostProcessor(){
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+
+        XMLBeanDefinitionReader beanDefinitionReader = new XMLBeanDefinitionReader(beanFactory);
+        beanDefinitionReader.loadBeanDefinitions("classpath:spring.xml");
+
+        MyBeanPostFactoryPostProcessor myBeanPostFactoryPostProcessor = new MyBeanPostFactoryPostProcessor();
+        myBeanPostFactoryPostProcessor.postProcessorBeanFactory(beanFactory);
+
+        MyBeanPostProcessor myBeanPostProcessor = new MyBeanPostProcessor();
+        beanFactory.addBeanPostProcessor(myBeanPostProcessor);
+
+        UserService userService = beanFactory.getBean("userService", UserService.class);
+        String result = userService.queryUserInfo();
+        System.out.println(result);
+    }
+
+    @Test
+    public void test_xmlPostProcessor(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:springPostProcessor.xml");
+
+        UserService userService = applicationContext.getBean("userService", UserService.class);
+        String s = userService.queryUserInfo();
+        System.out.println(s);
     }
 
 }

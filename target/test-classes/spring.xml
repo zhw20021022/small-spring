@@ -5,6 +5,8 @@
 
     <bean id="userService" class="cn.yfd.springframework.test.bean.UserService">
             <property name="uid" value="100001"/>
+            <property name="company" value="腾讯"/>
+            <property name="location" value="深圳"/>
             <property name="userDao" ref="userDao"/>
     </bean>
 </beans>

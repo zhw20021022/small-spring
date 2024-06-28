@@ -4,7 +4,7 @@ import cn.yfd.springframework.Beans.BeansException;
 
 import java.util.Map;
 
-public interface ListableBeanFactory {
+public interface ListableBeanFactory extends BeanFactory{
 
     /**
      * 按照类型返回Bean的实例
