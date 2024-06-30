@@ -6,6 +6,7 @@ import cn.yfd.springframework.Beans.factory.config.BeanFactoryPostProcessor;
 import cn.yfd.springframework.Beans.factory.config.BeanPostProcessor;
 import cn.yfd.springframework.context.ConfigurableApplicationContext;
 import cn.yfd.springframework.core.io.DefaultResourceLoader;
+import org.omg.SendingContext.RunTime;
 
 import java.util.Map;
 
@@ -73,6 +74,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     @Override
     public <T> T getBean(String name, Class<T> requiredType) throws BeansException{
         return getBeanFactory().getBean(name, requiredType);
+    }
+
+    @Override
+    public void registerShutDownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                close();
+            }
+        });
+    }
+
+    @Override
+    public void close() {
+        getBeanFactory().destroySingletons();
     }
 }
 

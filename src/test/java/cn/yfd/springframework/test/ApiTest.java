@@ -14,6 +14,7 @@ import cn.yfd.springframework.core.io.Resource;
 import cn.yfd.springframework.test.bean.Interecptor;
 import cn.yfd.springframework.test.bean.UserDao;
 import cn.yfd.springframework.test.bean.UserService;
+import cn.yfd.springframework.test.bean.UserService1;
 import cn.yfd.springframework.test.common.MyBeanPostFactoryPostProcessor;
 import cn.yfd.springframework.test.common.MyBeanPostProcessor;
 import net.sf.cglib.proxy.Enhancer;
@@ -188,6 +189,15 @@ public class ApiTest {
         System.out.println(s);
     }
 
+    @Test
+    public void test_initAndDestroy(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutDownHook();
+
+        UserService1 userService = applicationContext.getBean("userService1", UserService1.class);
+        String result = userService.queryUserInfo();
+        System.out.println(result);
+    }
 }
 
 
