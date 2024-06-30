@@ -11,10 +11,7 @@ import cn.yfd.springframework.Beans.factory.xml.XMLBeanDefinitionReader;
 import cn.yfd.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.yfd.springframework.core.io.DefaultResourceLoader;
 import cn.yfd.springframework.core.io.Resource;
-import cn.yfd.springframework.test.bean.Interecptor;
-import cn.yfd.springframework.test.bean.UserDao;
-import cn.yfd.springframework.test.bean.UserService;
-import cn.yfd.springframework.test.bean.UserService1;
+import cn.yfd.springframework.test.bean.*;
 import cn.yfd.springframework.test.common.MyBeanPostFactoryPostProcessor;
 import cn.yfd.springframework.test.common.MyBeanPostProcessor;
 import net.sf.cglib.proxy.Enhancer;
@@ -197,6 +194,19 @@ public class ApiTest {
         UserService1 userService = applicationContext.getBean("userService1", UserService1.class);
         String result = userService.queryUserInfo();
         System.out.println(result);
+    }
+
+    @Test
+    public void test_Aware(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring2.xml");
+        applicationContext.registerShutDownHook();
+
+        UserService2 userService2 = applicationContext.getBean("userService2", UserService2.class);
+        String result = userService2.queryUserInfo();
+        System.out.println("测试结果: "+result);
+        System.out.println("applicationContextAware: "+userService2.getApplicationContext());
+        System.out.println("beanFactoryAware: "+userService2.getBeanFactory());
+
     }
 }
 
