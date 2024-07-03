@@ -3,7 +3,6 @@ package cn.yfd.springframework.test;
 import cn.hutool.core.io.IoUtil;
 import cn.yfd.springframework.Beans.PropertyValue;
 import cn.yfd.springframework.Beans.PropertyValues;
-import cn.yfd.springframework.Beans.factory.BeanFactory;
 import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
 import cn.yfd.springframework.Beans.factory.config.BeanReference;
 import cn.yfd.springframework.Beans.factory.support.DefaultListableBeanFactory;
@@ -15,17 +14,14 @@ import cn.yfd.springframework.test.bean.*;
 import cn.yfd.springframework.test.common.MyBeanPostFactoryPostProcessor;
 import cn.yfd.springframework.test.common.MyBeanPostProcessor;
 import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-import net.sf.cglib.proxy.NoOp;
 import org.junit.Before;
 import org.junit.Test;
+import org.openjdk.jol.info.ClassLayout;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class ApiTest {
 
@@ -207,6 +203,30 @@ public class ApiTest {
         System.out.println("applicationContextAware: "+userService2.getApplicationContext());
         System.out.println("beanFactoryAware: "+userService2.getBeanFactory());
 
+    }
+
+    @Test
+    public void test_factory_bean(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring3.xml");
+        applicationContext.registerShutDownHook();
+
+         UserService3 userService1 = applicationContext.getBean("userService3", UserService3.class);
+         UserService3 userService2 = applicationContext.getBean("userService3", UserService3.class);
+
+        System.out.println(userService1);
+        System.out.println(userService2);
+
+        System.out.println(userService1 + "十六进制哈希:" + Integer.toHexString(userService1.hashCode()));
+        System.out.println(ClassLayout.parseInstance(userService1).toPrintable());
+    }
+
+    @Test
+    public void test_Proxy(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring3.xml");
+        applicationContext.registerShutDownHook();
+
+        UserService3 userService = applicationContext.getBean("userService3", UserService3.class);
+        System.out.println("测试结果:"+userService.queryUserInfo());
     }
 }
 
