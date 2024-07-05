@@ -36,7 +36,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         //判断是否为单例Bean,若是，放在内存中
         if(beanDefinition.isSingleton()){
-            addSingleton(beanName, bean);
+            registerSingleton(beanName, bean);
         }
         return bean;
     }

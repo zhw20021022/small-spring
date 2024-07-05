@@ -13,6 +13,7 @@ import cn.yfd.springframework.core.io.Resource;
 import cn.yfd.springframework.test.bean.*;
 import cn.yfd.springframework.test.common.MyBeanPostFactoryPostProcessor;
 import cn.yfd.springframework.test.common.MyBeanPostProcessor;
+import cn.yfd.springframework.test.event.CustomEvent;
 import net.sf.cglib.proxy.Enhancer;
 import org.junit.Before;
 import org.junit.Test;
@@ -227,6 +228,14 @@ public class ApiTest {
 
         UserService3 userService = applicationContext.getBean("userService3", UserService3.class);
         System.out.println("测试结果:"+userService.queryUserInfo());
+    }
+
+    @Test
+    public void test_Event(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring4.xml");
+        applicationContext.publishEvent(new CustomEvent(applicationContext, 100001L, "成功了"));
+
+        applicationContext.registerShutDownHook();
     }
 }
 
