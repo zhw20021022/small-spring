@@ -7,6 +7,11 @@ import cn.yfd.springframework.Beans.factory.config.BeanDefinition;
 import cn.yfd.springframework.Beans.factory.config.BeanReference;
 import cn.yfd.springframework.Beans.factory.support.DefaultListableBeanFactory;
 import cn.yfd.springframework.Beans.factory.xml.XMLBeanDefinitionReader;
+import cn.yfd.springframework.aop.AdvisedSupport;
+import cn.yfd.springframework.aop.TargetSource;
+import cn.yfd.springframework.aop.aspectJ.AspectJExpressionPointcut;
+import cn.yfd.springframework.aop.framework.Cglib2AopProxy;
+import cn.yfd.springframework.aop.framework.JdkDynamicAopProxy;
 import cn.yfd.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.yfd.springframework.core.io.DefaultResourceLoader;
 import cn.yfd.springframework.core.io.Resource;
@@ -23,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ApiTest {
 
@@ -236,6 +242,34 @@ public class ApiTest {
         applicationContext.publishEvent(new CustomEvent(applicationContext, 100001L, "成功了"));
 
         applicationContext.registerShutDownHook();
+    }
+
+    @Test
+    public void test_aop() throws NoSuchMethodException{
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* cn.yfd.springframework.test.bean.UserService.*(..))");
+        Class<UserService> clazz = UserService.class;
+        Method method = clazz.getDeclaredMethod("queryUserInfo");
+
+        System.out.println(pointcut.matches(clazz));
+        System.out.println(pointcut.matches(method, clazz));
+    }
+
+    @Test
+    public void test_dynamic(){
+        IUserService userService = new UserService4();
+
+        AdvisedSupport advisedSupport = new AdvisedSupport();
+        advisedSupport.setTargetSource(new TargetSource(userService));
+        advisedSupport.setMethodInterceptor(new UserServiceInterceptor());
+        advisedSupport.setMethodMatcher(new AspectJExpressionPointcut("execution(* cn.yfd.springframework.test.bean.IUserService.*(..))"));
+
+        IUserService proxy_jdk = (IUserService) new JdkDynamicAopProxy(advisedSupport).getProxy();
+        System.out.println("测试结果: "+proxy_jdk.queryUserInfo());
+
+        IUserService proxy_Cglib = (IUserService) new Cglib2AopProxy(advisedSupport).getProxy();
+        System.out.println("测试结果: "+proxy_Cglib.register("张张"));
+
+
     }
 }
 
