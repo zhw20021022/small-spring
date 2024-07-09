@@ -278,6 +278,20 @@ public class ApiTest {
         IUserService userService = classPathXmlApplicationContext.getBean("userService4", IUserService.class);
         System.out.println("测试结果: "+userService.queryUserInfo());
     }
+
+    @Test
+    public void test_scan(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-scan.xml");
+        IUserService userService5 = applicationContext.getBean("userService5", IUserService.class);
+        System.out.println("测试结果:"+userService5.queryUserInfo());
+    }
+
+    @Test
+    public void test_property(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-property.xml");
+        IUserService userService5 = applicationContext.getBean("userService5", IUserService.class);
+        System.out.println("测试结果：" + userService5);
+    }
 }
 
 
