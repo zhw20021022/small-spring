@@ -292,6 +292,13 @@ public class ApiTest {
         IUserService userService5 = applicationContext.getBean("userService5", IUserService.class);
         System.out.println("测试结果：" + userService5);
     }
+
+    @Test
+    public void test_annotation(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring6.xml");
+        UserService6 userService6 = applicationContext.getBean("userService6", UserService6.class);
+        System.out.println("测试结果："+userService6.queryUserInfo());
+    }
 }
 
 

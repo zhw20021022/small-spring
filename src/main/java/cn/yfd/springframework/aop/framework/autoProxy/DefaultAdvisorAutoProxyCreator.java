@@ -1,6 +1,7 @@
 package cn.yfd.springframework.aop.framework.autoProxy;
 
 import cn.yfd.springframework.Beans.BeansException;
+import cn.yfd.springframework.Beans.PropertyValues;
 import cn.yfd.springframework.Beans.factory.BeanFactory;
 import cn.yfd.springframework.Beans.factory.BeanFactoryAware;
 import cn.yfd.springframework.Beans.factory.config.InstantiationAwareBeanPostProcessor;
@@ -53,6 +54,11 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
         return null;
     }
 
+    @Override
+    public PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) {
+        return pvs;
+    }
+
     private boolean isInfrastructureClass(Class<?> beanClass){
         return Advice.class.isAssignableFrom(beanClass) || Advisor.class.isAssignableFrom(beanClass) || Pointcut.class.isAssignableFrom(beanClass);
     }
@@ -66,5 +72,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
     public Object postProcessorAfterInitialization(Object bean, String beanName) {
         return bean;
     }
+
+
 
 }
