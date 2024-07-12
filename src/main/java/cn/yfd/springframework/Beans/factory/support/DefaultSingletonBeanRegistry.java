@@ -49,7 +49,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
         singletonFactories.remove(beanName);
     }
 
-    protected void addSingleFactory(String beanName, ObjectFactory<?> singletonFactory){
+    protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory){
         if(!this.singletonObjects.containsKey(beanName)){
             this.singletonFactories.put(beanName, singletonFactory);
             this.earlySingletonObjects.remove(beanName);
