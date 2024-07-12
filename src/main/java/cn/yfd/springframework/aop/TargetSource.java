@@ -1,5 +1,8 @@
 package cn.yfd.springframework.aop;
 
+import cn.hutool.core.util.ClassUtil;
+import cn.yfd.springframework.util.ClassUtils;
+
 public class TargetSource {
 
     private final Object target;
@@ -9,7 +12,9 @@ public class TargetSource {
     }
 
     public Class<?>[] getTargetClass(){
-        return this.target.getClass().getInterfaces();
+        Class<?> clazz = this.target.getClass();
+        clazz = ClassUtils.isCGlibProxyClass(clazz) ? clazz.getSuperclass() : clazz;
+        return clazz.getInterfaces();
     }
 
     public Object getTarget(){

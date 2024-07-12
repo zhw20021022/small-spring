@@ -62,7 +62,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition){
         Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
         if(bean != null){
-            bean = applyBeanPostProcessorAfterInitiation(bean, beanName);
+            bean = applyBeanPostProcessorAfterInitialization(bean, beanName);
         }
         return bean;
 
@@ -148,7 +148,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             }
         }
 
-        Object wrappedBean = applyBeanPostProcessorBeforeInitiation(bean, beanName);
+        Object wrappedBean = applyBeanPostProcessorBeforeInitialization(bean, beanName);
 
         try {
             //执行bean对象初始化方法
@@ -157,7 +157,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throw new BeansException("Invocation of init method of bean["+ beanName+"] failed", e);
         }
 
-        wrappedBean = applyBeanPostProcessorAfterInitiation(wrappedBean, beanName);
+        wrappedBean = applyBeanPostProcessorAfterInitialization(wrappedBean, beanName);
 
         return wrappedBean;
     }
@@ -177,7 +177,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
     }
 
-    public Object applyBeanPostProcessorBeforeInitiation(Object existingBean, String beanName) throws BeansException{
+    public Object applyBeanPostProcessorBeforeInitialization(Object existingBean, String beanName) throws BeansException{
         Object result = existingBean;
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
             Object current = beanPostProcessor.postProcessorBeforeInitialization(result, beanName);
@@ -187,7 +187,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return result;
     }
 
-    public Object applyBeanPostProcessorAfterInitiation(Object existingBean, String beanName) throws BeansException{
+    public Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName) throws BeansException{
         Object result = existingBean;
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
             Object current = beanPostProcessor.postProcessorAfterInitialization(result, beanName);
